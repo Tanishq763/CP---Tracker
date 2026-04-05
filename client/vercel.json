@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://cp-tracker-server.onrender.com/api/:path*"
+    }
+  ]
+}
