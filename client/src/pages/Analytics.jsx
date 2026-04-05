@@ -70,7 +70,7 @@ const PasswordGate = ({ onAuth }) => {
         </button>
       </form>
       {error && <p className="text-rose-400 text-sm">{error}</p>}
-      <p className="text-slate-700 text-xs">Set ANALYTICS_PASSWORD in server/.env<br/>Leave blank to disable auth</p>
+      
     </div>
   )
 }
