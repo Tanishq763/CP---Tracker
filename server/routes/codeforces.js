@@ -18,4 +18,10 @@ router.post('/analytics/visit',         recordVisit);
 router.post('/analytics/roadmap',       recordRoadmap);
 router.get('/analytics/dashboard',      getDashboard);
 
+// Pool status — for debugging
+router.get('/groq-status', (req, res) => {
+  const { getPoolStatus } = require('../groqPool');
+  res.json(getPoolStatus());
+});
+
 module.exports = router;
