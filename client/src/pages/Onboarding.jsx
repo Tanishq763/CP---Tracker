@@ -74,7 +74,7 @@ export default function Onboarding() {
                 type="text"
                 value={cfHandle}
                 onChange={e => setCfHandle(e.target.value)}
-                placeholder="e.g. tourist"
+                placeholder="e.g. Wanderer_Tanishq"
                 className="w-full bg-[#080c14] border border-[#1e304d] focus:border-blue-500/50 rounded-xl px-4 py-3 text-white placeholder-slate-600 font-mono text-sm focus:outline-none transition"
               />
               <p className="text-slate-600 text-xs mt-1.5">Your Codeforces username</p>
@@ -89,7 +89,7 @@ export default function Onboarding() {
                 type="text"
                 value={lcHandle}
                 onChange={e => setLcHandle(e.target.value)}
-                placeholder="e.g. sharstigarg17"
+                placeholder="e.g. Wanderer_Tanishq"
                 className="w-full bg-[#080c14] border border-[#1e304d] focus:border-amber-500/50 rounded-xl px-4 py-3 text-white placeholder-slate-600 font-mono text-sm focus:outline-none transition"
               />
               <p className="text-slate-600 text-xs mt-1.5">Your LeetCode username</p>
