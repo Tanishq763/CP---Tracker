@@ -155,13 +155,13 @@ export default function Profile() {
               <div>
                 <label className="text-slate-400 text-xs mb-1.5 block">⚡ Codeforces Handle</label>
                 <input value={cfHandle} onChange={e => setCfHandle(e.target.value)}
-                  placeholder="e.g. tourist"
+                  placeholder="e.g. wanderer_tanishq"
                   className="w-full bg-[#080c14] border border-[#1e304d] focus:border-blue-500/50 rounded-xl px-4 py-3 text-white placeholder-slate-600 font-mono text-sm focus:outline-none transition" />
               </div>
               <div>
                 <label className="text-slate-400 text-xs mb-1.5 block">🟨 LeetCode Handle</label>
                 <input value={lcHandle} onChange={e => setLcHandle(e.target.value)}
-                  placeholder="e.g. sharstigarg17"
+                  placeholder="e.g. wanderer_tanishq"
                   className="w-full bg-[#080c14] border border-[#1e304d] focus:border-amber-500/50 rounded-xl px-4 py-3 text-white placeholder-slate-600 font-mono text-sm focus:outline-none transition" />
               </div>
               <div className="flex items-center gap-3">
