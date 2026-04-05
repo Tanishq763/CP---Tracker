@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://cp-tracker-server.onrender.com/api/:path*"
+      "destination": "https://cp-tracker-server-7u6u.onrender.com/api/:path*"
     }
   ]
 }
