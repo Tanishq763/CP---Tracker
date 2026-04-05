@@ -10,7 +10,7 @@ let _groqIndex = 0;
   while (process.env[`GROQ_API_KEY_${i}`]) { _groqKeys.push(process.env[`GROQ_API_KEY_${i}`]); i++; }
   console.log(`Groq pool: ${_groqKeys.length} key(s) loaded`);
 })();
-const groqRequest = async (axios, prompt) => {
+const groqRequest = async (prompt) => {
   if (_groqKeys.length === 0) throw new Error('No GROQ_API_KEY configured in .env');
   let lastErr;
   for (let attempt = 0; attempt < _groqKeys.length; attempt++) {
