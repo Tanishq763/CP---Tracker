@@ -1,5 +1,37 @@
 const axios = require('axios');
 const cache = require('../cache/cache');
+// ── Inline Groq Key Pool ─────────────────────────────────────────────────────
+const _groqKeys = [];
+const _groqCooldowns = {};
+let _groqIndex = 0;
+(() => {
+  if (process.env.GROQ_API_KEY) _groqKeys.push(process.env.GROQ_API_KEY);
+  let i = 1;
+  while (process.env[`GROQ_API_KEY_${i}`]) { _groqKeys.push(process.env[`GROQ_API_KEY_${i}`]); i++; }
+  console.log(`Groq pool: ${_groqKeys.length} key(s) loaded`);
+})();
+const groqRequest = async (axios, prompt) => {
+  if (_groqKeys.length === 0) throw new Error('No GROQ_API_KEY configured in .env');
+  let lastErr;
+  for (let attempt = 0; attempt < _groqKeys.length; attempt++) {
+    const now = Date.now();
+    const idx = (_groqIndex + attempt) % _groqKeys.length;
+    const key = _groqKeys[idx];
+    if ((_groqCooldowns[key] || 0) > now) continue;
+    _groqIndex = (idx + 1) % _groqKeys.length;
+    try {
+      return await axios.post('https://api.groq.com/openai/v1/chat/completions',
+        { model:'llama-3.3-70b-versatile', messages:[{role:'user',content:prompt}], temperature:0.65, max_tokens:8000 },
+        { headers:{ 'Content-Type':'application/json', 'Authorization':`Bearer ${key}` }, timeout:60000 }
+      );
+    } catch(err) {
+      lastErr = err;
+      if (err.response?.status === 429) { _groqCooldowns[key] = now + 65000; continue; }
+      throw err;
+    }
+  }
+  throw lastErr || new Error('All Groq keys rate limited. Wait 1 minute and try again.');
+};
 const { checkRoadmapLimit, incrementRoadmapCount, saveRoadmap } = require('../db/users');
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -543,17 +575,7 @@ Generate ALL ${Math.ceil(Number(duration)/7)} weeks. Raw JSON only, no markdown,
 }`;
 
     // ── Call Groq ─────────────────────────────────────────────────────────────
-    const groqKey = process.env.GROQ_API_KEY;
-    if (!groqKey) throw new Error('GROQ_API_KEY not set in server/.env');
-
-    const groqRes = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
-      model: 'llama-3.3-70b-versatile',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.65,
-      max_tokens: 8000,
-    }, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${groqKey}` } });
-
-    let rawText = groqRes.data.choices[0].message.content.trim().replace(/```json|```/g, '').trim();
+    const rawText = (await groqRequest(prompt)).replace(/```json|```/g, '').trim();
     const roadmap = JSON.parse(rawText);
 
     // ── Attach multi-sheet problems to each day ───────────────────────────────
@@ -596,7 +618,7 @@ Generate ALL ${Math.ceil(Number(duration)/7)} weeks. Raw JSON only, no markdown,
 
   } catch (err) {
     console.error('LC Roadmap error:', err.response?.data || err.message);
-    if (err.response?.status === 429) return res.status(429).json({ error: 'Groq rate limit. Wait a minute and retry.' });
+    if (err.response?.status === 429 || err.message?.includes('rate limit') || err.message?.includes('rate limited')) return res.status(429).json({ error: err.message || 'All API keys rate limited. Try again in 1 minute.' });
     if (err instanceof SyntaxError) return res.status(500).json({ error: 'Failed to parse AI response. Try again.' });
     res.status(500).json({ error: err.message });
   }
