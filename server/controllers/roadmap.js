@@ -255,8 +255,9 @@ IMPORTANT: Raw JSON only. No markdown. No backticks.
   "motivation": "personalized message referencing their exact rating ${userRating}, the ${ratingTrend} trend, and a specific encouragement tied to their data"
 }`;
 
-    const rawText = (await groqRequest(prompt)).replace(/```json|```/g, '').trim();
-    const roadmap = JSON.parse(rawText);
+    const rawContent = groqRes.data.choices[0].message.content;
+   const rawText = (typeof rawContent === 'string' ? rawContent : JSON.stringify(rawContent)).trim().replace(/```json|```/g, '').trim();
+   const roadmap = JSON.parse(rawText);
 
     roadmap.weeks = roadmap.weeks.map(week => ({
       ...week,
