@@ -575,7 +575,8 @@ Generate ALL ${Math.ceil(Number(duration)/7)} weeks. Raw JSON only, no markdown,
 }`;
 
     // ── Call Groq ─────────────────────────────────────────────────────────────
-    const rawText = (await groqRequest(prompt)).replace(/```json|```/g, '').trim();
+    const rawContent = groqRes.data.choices[0].message.content;
+    const rawText = (typeof rawContent === 'string' ? rawContent : JSON.stringify(rawContent)).trim().replace(/```json|```/g, '').trim();
     const roadmap = JSON.parse(rawText);
 
     // ── Attach multi-sheet problems to each day ───────────────────────────────
